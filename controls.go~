@@ -1,0 +1,11 @@
+package main
+
+var keyStateMap map[string]bool
+
+func init() {
+	keyStateMap = make(map[string]bool)
+}
+
+func DispatchKey(keyname string) {
+	
+}
