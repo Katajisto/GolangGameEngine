@@ -18,8 +18,7 @@ var SDL_WINDOW_POINTER *sdl.Window
 var SDL_SURFACE_POINTER *sdl.Surface
 
 
-
-func Start() {
+func sdlStart() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
