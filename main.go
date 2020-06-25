@@ -4,27 +4,53 @@ package main
 
 var x int32 = 0
 
-func DrawFunc() {
-	if(GetKeyState("A")) {
-		x += 10;
-	} else {
-		x++;
-	}
-	if x > 800 { 
-		DrawRect(x,0,200,200)
-		DrawRect((x-800)-200,0,200,200)
-	} else {
-		DrawRect(x,0,200,200)
-	}
+type Block struct {
+	phys BasePhys
+}
 
-	if x > 1000 {
-		x = 0
-	}
+func (block *Block) Draw() {
+	b := block.phys
+	DrawRect(b.y, b.x, b.w, b.h)
+}
+
+func (block *Block) GetBasePhys() *BasePhys {
+	return &block.phys
 }
 
 func main() {
-	SetDrawHook(DrawFunc)
+	InitCamera(0,1000,1000,1000)
+	test := &Block{BasePhys{0,100,100,100,5,Vector{0,0},25}}
+	AddEntity(test)
+	AddKeyHook("Space", func() {
+		test.phys.setYVelocity(20)
+	})
+	SetPhysHook(func() {
+		if GetKeyState("A") {
+			test.phys.Apply(Vector{-0.4,0})
+		}
+		if GetKeyState("D") {
+			test.phys.Apply(Vector{0.4,0})
+		}
+		if test.phys.velocity.x > 6 { 
+			test.phys.velocity.x = 6
+		}
+		if test.phys.velocity.x < -6 {
+			test.phys.velocity.x = -6
+		}
+		//		SetCameraPos(test.phys.x-500, 1000)
+	})
+	AddKeyPressHook("D", func() {
+		test.phys.setXVelocity(3)
+	})
+	AddKeyPressHook("A", func() {
+		test.phys.setXVelocity(-3)
+	})
+	EngineInit()
+	SetDrawHook(func() {
+		//	DrawFont(texture)
+	})
 	EngineStart ()
 	CleanUp()
+	PrintStat()
 	
 }

@@ -9,4 +9,4 @@ func SetDrawHook(hook func()) {
 
 func SetPhysHook(hook func()) {
 	physHook = hook
-}
+}m

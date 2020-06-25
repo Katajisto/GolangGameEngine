@@ -1,0 +1,31 @@
+package main
+
+type BasePhys struct {
+	x float64
+	y float64
+	velocity Vector
+}
+
+
+//Applies a 2D vector to a base phys object.
+func (base *BasePhys) Apply(force Vector) {
+	base.velocity = base.velocity.Add(force)
+}
+
+//Takes a vector and subtracts its value from the basePhys
+func (base *BasePhys) Brake(force Vector) {
+	force = VAbs(force)
+	base.velocity = base.velocity.Sub(force)
+	if base.velocity.x < 0 { base.velocity.x = 0 }
+	if base.velocity.y < 0 { base.velocity.y = 0 }
+}
+
+func (b *BasePhys) phys(dt float64) {
+	//Apply gravity
+	b.Apply(Vector{0,10}.Mul(dt))
+	b.x += b.velocity.x
+	b.y += b.velocity.y
+	if b.y >= 900 {
+		b.y = 900;
+	}
+}

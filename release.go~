@@ -1,0 +1,5 @@
+// +build !debug
+
+const(
+	debug = false
+)

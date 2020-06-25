@@ -6,6 +6,8 @@ package main
 
 import(
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
+
 )
 
 const(
@@ -16,13 +18,17 @@ const(
 
 var SDL_WINDOW_POINTER *sdl.Window
 var SDL_SURFACE_POINTER *sdl.Surface
+var SDL_RENDERER *sdl.Renderer
+
 
 
 func sdlStart() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
-
+	if err := ttf.Init(); err != nil {
+		Log("Failed to initialize TTF: %s\n", err)
+	}
 	var err error
 	SDL_WINDOW_POINTER, err = sdl.CreateWindow(windowTitle, sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED, windowHeight, windowWidth, sdl.WINDOW_SHOWN)
 	if err != nil {
@@ -31,6 +37,10 @@ func sdlStart() {
 	SDL_SURFACE_POINTER, err = SDL_WINDOW_POINTER.GetSurface()
 	if err != nil {
 		panic(err)
+	}
+	SDL_RENDERER, err = sdl.CreateRenderer(SDL_WINDOW_POINTER, -1, sdl.RENDERER_ACCELERATED)
+	if err != nil {
+		Log("Failed to create renderer: %s\n", err)
 	}
 }
 
@@ -57,14 +67,54 @@ func HandleEvent() bool {
 }
 
 func Draw() {
-	SDL_WINDOW_POINTER.UpdateSurface()
+	SDL_RENDERER.Present()
 }
 
 func Clear() {
-	SDL_SURFACE_POINTER.FillRect(nil,0)
+	SDL_RENDERER.SetDrawColor(0,0,0,255)
+	SDL_RENDERER.Clear()
 }
 
-func DrawRect(y,x,w,h int32) {
-	rect := sdl.Rect{y,x,w,h}
-	SDL_SURFACE_POINTER.FillRect(&rect, 0xffff0000)
+func DrawRect(y,x,w,h float64) {
+	y = cameraY - y
+	x = x - cameraX
+	rect := sdl.Rect{FtoI(x),FtoI(y),FtoI(w),FtoI(h)}
+	SDL_RENDERER.SetDrawColor(0,0,255,255)
+	SDL_RENDERER.FillRect(&rect)
 }
+
+func LoadFont(fontName string, size int) *ttf.Font {
+	var font *ttf.Font
+	var err error
+	if font, err = ttf.OpenFont(fontName, size); err != nil {
+		Log("Failed to open font: %s\n", err)
+		return nil
+	}
+	return font
+}
+
+var DEBUG_FONT *ttf.Font
+
+func CreateFontSurface(font *ttf.Font, text string) *sdl.Surface  {
+	var err error
+	var solidSurface *sdl.Surface
+	if solidSurface, err = font.RenderUTF8Solid(text, sdl.Color{255,255,255,255}); err != nil {
+		Log("Failed to create font surface")
+	}
+	return solidSurface
+}
+
+func CreateFontTexture(font *ttf.Font, text string) *sdl.Texture {
+	var texture *sdl.Texture
+	var err error
+	surface := CreateFontSurface(font, text)
+	if texture, err = SDL_RENDERER.CreateTextureFromSurface(surface); err != nil {
+		Log("Failed to create texture")
+	}
+	return texture
+}
+
+func DrawFont(texture *sdl.Texture, x,y,w,h float64) {
+	SDL_RENDERER.Copy(texture, nil, &sdl.Rect{FtoI(x),FtoI(y),FtoI(w),FtoI(h)})
+}
+
