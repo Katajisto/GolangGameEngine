@@ -13,8 +13,10 @@ func init() {
 //Receives a bool wheter the key is down or not.
 func DispatchKey(keyname string, state bool) {
 	// Fire key 
-	for _, hook := range keyHookMap[keyname] {
-		hook()
+	if state {
+		for _, hook := range keyHookMap[keyname] {
+			hook()
+		}
 	}
 	// Update key state
 	keyStateMap[keyname] = state

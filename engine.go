@@ -2,7 +2,7 @@ package main
 
 import(
 	"time"
-	"strconv"
+	_ "strconv"
 )
 
 var avg_draw_time int64 = 5
@@ -14,7 +14,6 @@ const(
 
 func EngineInit() {
 	sdlStart()
-	initDebug()
 }
 
 func EngineStart() {
@@ -26,9 +25,6 @@ func EngineStart() {
 		KeepLooping = HandleEvent()
 		frameStartTime := time.Now()
 		Clear()
-		if DEBUG_MODE {
-			printDebugData([]string{"AVG DRAW: " + strconv.Itoa(avg_draw_time), "AVG PHYS: " + strconv.Itoa(avg_phys_time), "AVERAGE FPS: ", strconv.Itoa(frames/int(time.Now().Sub(runtime).Seconds()))})
-		}
 		drawHook()
 		DrawCameraArea()
 		Draw()

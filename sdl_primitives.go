@@ -20,7 +20,29 @@ var SDL_WINDOW_POINTER *sdl.Window
 var SDL_SURFACE_POINTER *sdl.Surface
 var SDL_RENDERER *sdl.Renderer
 
-
+func ToggleFullscreen() {
+	fullscreenFlag := uint32(sdl.WINDOW_FULLSCREEN)
+	isFullscreen := SDL_WINDOW_POINTER.GetFlags() & fullscreenFlag
+	
+	if isFullscreen == 0 {
+		dm, err := sdl.GetCurrentDisplayMode(0)
+		if err != nil {
+			Log("Error getting display mode: ", err)
+		}
+		Log(dm.W, dm.H)
+		SDL_WINDOW_POINTER.SetFullscreen(fullscreenFlag)
+		sdl.ShowCursor(0)
+		SDL_WINDOW_POINTER.SetSize(dm.W, dm.H)
+		cameraW = float64(dm.W)
+		cameraH = float64(dm.H)
+		
+	} else {
+		SDL_WINDOW_POINTER.SetFullscreen(0)
+		sdl.ShowCursor(1)
+		SDL_WINDOW_POINTER.SetSize(1000, 1000)
+	}
+	
+}
 
 func sdlStart() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {

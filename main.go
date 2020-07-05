@@ -24,6 +24,7 @@ func main() {
 	AddKeyHook("Space", func() {
 		test.phys.setYVelocity(20)
 	})
+	AddKeyHook("F", ToggleFullscreen)
 	SetPhysHook(func() {
 		if GetKeyState("A") {
 			test.phys.Apply(Vector{-0.4,0})
