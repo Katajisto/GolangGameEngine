@@ -47,12 +47,27 @@ func (base *BasePhys) Brake(force Vector) {
 func (b *BasePhys) phys() {
 	//Apply gravity
 	b.Apply(Vector{0,-0.1}.Mul(b.weight))
+	bx_old := b.x
+	by_old := b.y
 	b.x += b.velocity.x
-	b.y += b.velocity.y
-	// TODO: isTouchingGround
-	if b.y <= 100 {
+	for _, entity := range entityList {
+		if b != entity.GetBasePhys() && entity.GetBasePhys().Collides(b) {
+			b.x = bx_old
+			b.velocity.x = 0
+		}
+	}
+	b.y += b.velocity.y	
+	for _, entity := range entityList {
+		if b != entity.GetBasePhys() &&  entity.GetBasePhys().Collides(b) {
+			b.y = by_old
+			b.velocity.y = 0
+		}
+	}
+	
+	if b.velocity.y == 0 {
 		b.Brake(Vector{0.01*b.friction,0})
 	}
+	
 	if b.y <= 100 {
 		b.y = 100;
 		b.velocity.y = 0;

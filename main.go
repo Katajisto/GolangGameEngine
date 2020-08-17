@@ -20,10 +20,14 @@ func (block *Block) GetBasePhys() *BasePhys {
 func main() {
 	InitCamera(0,1000,1000,1000)
 	test := &Block{BasePhys{0,100,100,100,5,Vector{0,0},25}}
+	collider := &Block{BasePhys{200,300,300,100,0,Vector{0,0},25}}
+	collider2 := &Block{BasePhys{400,700,300,100,0,Vector{0,0},25}}
 	AddEntity(test)
+	AddEntity(collider)
+	AddEntity(collider2)
 	AddKeyHook("Space", func() {
 		test.phys.setYVelocity(20)
-	})
+ 	})
 	AddKeyHook("F", ToggleFullscreen)
 	SetPhysHook(func() {
 		if GetKeyState("A") {
@@ -37,6 +41,9 @@ func main() {
 		}
 		if test.phys.velocity.x < -6 {
 			test.phys.velocity.x = -6
+		}
+		if collider.phys.Collides(&test.phys) {
+			Log("COLLISION")
 		}
 		//		SetCameraPos(test.phys.x-500, 1000)
 	})
